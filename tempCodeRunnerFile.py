@@ -5,13 +5,12 @@ from PIL import Image, ImageTk
 
 Cascade_file = "/opt/anaconda3/lib/python3.13/site-packages/cv2/data/"
 Face = "haarcascade_frontalface_default.xml"
-Side = "haarcascade_profileface.xml"
-Eyes = "haarcascade_eye_tree_eyeglasses.xml"
+Eyes = "haarcascade_eye.xml"
+Glasses = "haarcascade_eye_tree_eyeglasses.xml"
 Smile = "haarcascade_smile.xml"
 
 class FaceRecognition:
     def __init__(self,root):
-        print('cv:' + cv.__version__)
         self.root = root
         self.root.title('face recognition')
         self.root.geometry('1200x900')
@@ -19,9 +18,9 @@ class FaceRecognition:
         self.cap = None
         self.detect = None
         self.face_cascade = cv.CascadeClassifier(Cascade_file+Face)
-        self.faceside_cascade = cv.CascadeClassifier(Cascade_file+Side)
         self.eyes_cascade = cv.CascadeClassifier(Cascade_file+Eyes)
         self.smile_cascade = cv.CascadeClassifier(Cascade_file+Smile)
+        self.glasses_cascade = cv.CascadeClassifier(Cascade_file+Glasses)
         self.create_widgets()
         self.root.protocol('WM_DELETE_WINDOW', self.close_window)
 
@@ -46,10 +45,10 @@ class FaceRecognition:
         cvbutton_frame.pack_propagate(False) 
         face_button = tk.Button(cvbutton_frame, text='Face', width=9, height=7,command=lambda: self.set_detectmode('face'))
         face_button.grid(column=0,row=0, padx=1, pady=5)
-        face_sidebutton =  tk.Button(cvbutton_frame, text='Face(side)', width=9, height=7,command=lambda: self.set_detectmode('face_side'))
-        face_sidebutton.grid(column=1,row=0, padx=1, pady=5)
-        eyes_button = tk.Button(cvbutton_frame, text='Eyes', width=9, height=7, command=lambda: self.set_detectmode('eyes'))
-        eyes_button.grid(column=0,row=1, padx=1, pady=5)
+        eye_button = tk.Button(cvbutton_frame, text='Eyes', width=9, height=7, command=lambda: self.set_detectmode('eyes'))
+        eye_button.grid(column=1,row=0, padx=1, pady=5)
+        glasses_button = tk.Button(cvbutton_frame, text='Glasses', width=9, height=7, command=lambda: self.set_detectmode('glasses'))
+        glasses_button.grid(column=0,row=1, padx=1, pady=5)
         smile = tk.Button(cvbutton_frame, text='Smile', width=9, height=7, command=lambda: self.set_detectmode('smile'))
         smile.grid(column=1,row=1, padx=1, pady=5)
 
@@ -61,7 +60,7 @@ class FaceRecognition:
         
     def set_capture(self):
         self.cam_on=True
-        self.cap = cv.VideoCapture(1)
+        self.cap = cv.VideoCapture(0)
         if not self.cap.isOpened():
             print("Cannot open camera")
             exit()
@@ -80,8 +79,6 @@ class FaceRecognition:
             
             if self.detect=='face':
                 detect_img = self.set_facedetect(frame, self.face_cascade)
-            elif self.detect == 'face_side':
-                detect_img = self.set_facedetect(frame, self.faceside_cascade)
             elif self.detect=='eyes':
                 detect_img = self.set_partsdetect(frame, self.face_cascade, self.eyes_cascade)
             elif self.detect=='smile':
@@ -94,26 +91,20 @@ class FaceRecognition:
             self.videolabel.configure(image=self.photo)
             self.videolabel.after(10,self.start_capture)
 
-    def set_facedetect(self,frame,cascade):
-        if cascade.empty():
-            print("Can not read cascade")
+    def set_facedetect(self,frame,face_cascade):
+        if face_cascade.empty():
+            print("カスケードファイルが読み込めません")
             return frame
 
         gray = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
-        
-        if self.detect=='face':
-            detect_rect = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=12, minSize=(50, 50))
-            for (x,y,w,h) in detect_rect:
-                cv.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),10)
-        elif self.detect=='face_side':
-            detect_rect = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
-            for (x2,y2,w2,h2) in detect_rect:
-                cv.rectangle(frame,(x2,y2),(x2+w2,y2+h2),(0,0,255),10)
+        detect_rect = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=12, minSize=(50, 50))
+        for (x,y,w,h) in detect_rect:
+            cv.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),10)
         return frame
 
     def set_partsdetect(self, frame, face_cascade, cascade):
         if face_cascade.empty() or cascade.empty():
-            print("Can not read cascade")
+            print("カスケードファイルが読み込めません")
             return frame
 
         gray = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
@@ -123,12 +114,12 @@ class FaceRecognition:
             if self.detect=='eyes':
                 eyes = gray[y:int(y+h/2),x:x+w]
                 eyes = cv.equalizeHist(eyes)
-                eyes_rect = cascade.detectMultiScale(eyes, scaleFactor=1.1, minNeighbors=15, minSize=(15, 15))
+                eyes_rect = cascade.detectMultiScale(eyes, scaleFactor=1.2, minNeighbors=20, minSize=(15, 15))
                 for (x2,y2,w2,h2) in eyes_rect:
                     cv.rectangle(frame,(x+x2,y+y2),(x+x2+w2,y+y2+h2),(0,0,255), 5)
             elif self.detect=='smile':
                 mouth = gray[int(y+h/2):(y+h),x:x+w]
-                smile_rect = cascade.detectMultiScale(mouth, scaleFactor=1.2, minNeighbors=20, minSize=(15, 15))
+                smile_rect = cascade.detectMultiScale(mouth, scaleFactor=1.2, minNeighbors=15, minSize=(15, 15))
                 for (x2,y2,w2,h2) in smile_rect:
                     cv.rectangle(frame,(x+x2,int(y+h/2)+y2),(x+x2+w2,int(y+h/2)+y2+h2),(0,0,255), 2)
         return frame
