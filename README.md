@@ -6,7 +6,7 @@
 </p>
 
 # Face Recognition List Application
-GUI face recognition application with python and tkinter.
+GUI face detection application with python and tkinter.
 
 ## Table of Contents
 - About the Project
@@ -38,6 +38,9 @@ A GUI face recognition application that detects face and facial features
 1.Install Python.
 
 2.Clone the repository to your local environment.
+```bash
+    git clone https://github.com/NNM-V/face_detection.git
+```
 
 3.Move to the project directory in the terminal.
 
