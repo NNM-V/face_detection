@@ -23,8 +23,14 @@ A GUI face recognition application that detects face and facial features
 <img width=50% alt="Image" src="https://github.com/user-attachments/assets/9a601449-a9a7-4995-a6dc-33b5bd6fdc62" />
 
 ## Environment
-- Python 3.11
-- tkinter
+Package               Version
+--------------------- --------
+numpy                 2.4.6
+opencv-contrib-python 5.0.0.93
+opencv-python         5.0.0.93
+pillow                13.0.0
+pip                   26.2.2
+setuptools            65.5.0
 
 ## Directory
 ```text
@@ -44,14 +50,14 @@ A GUI face recognition application that detects face and facial features
 
 3.Move to the project directory in the terminal.
 
-4.pip install required library with command below:
+5.pip install required library with command below:
 ```bash
     pip install -r requirements.txt
 ```
 
-5.Run program with command below:
+6.Run program with command below:
 ```bash
-    python main.py  
+    python3 main.py  
 ```
 
 ## How to Use
