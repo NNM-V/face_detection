@@ -47,19 +47,19 @@ setuptools            65.5.0
 
 2.Clone the repository to your local environment.
 ```bash
-    git clone https://github.com/NNM-V/face_detection.git
+git clone https://github.com/NNM-V/face_detection.git
 ```
 
 3.Move to the project directory in the terminal.
 
 5.pip install required library with command below:
 ```bash
-    pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 6.Run program with command below:
 ```bash
-    python3 main.py  
+python3 main.py  
 ```
 
 ## How to Use
